@@ -1,0 +1,42 @@
+name: "Update Bot"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 * * * *'
+      
+jobs:
+  update-data:
+    name: Update bot
+    runs-on: "macos-latest"
+    steps:
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: 'release'
+      - name: Setup - Checkout repo
+        uses: actions/checkout@v2
+      - name: "Install Packages"
+        run: |
+          install.packages('rtweet')
+          install.packages('dplyr')
+          install.packages('lubridate')
+          install.packages('remotes')
+          remotes::install_github("favstats/schwabr")
+          install.packages('stringr')
+          install.packages('purrr')
+        shell: Rscript {0}
+      - name: "Bot - Run"
+        run: Rscript 'bot.R'
+        env:
+          consumer_key: ${{ secrets.CONSUMER_KEY }}
+          consumer_secret: ${{ secrets.CONSUMER_SECRET }}
+          token: ${{ secrets.TOKEN }}
+          secret: ${{ secrets.SECRET }}
+      - name: "Commit"
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bot Routine
