@@ -6,11 +6,6 @@ library(purrr)
 library(schwabr)
 library(rtweet)
 
-consumer_key <- Sys.getenv("consumer_key")
-consumer_secret <- Sys.getenv("consumer_secret")
-access_token <- Sys.getenv("token")
-access_secret <- Sys.getenv("secret")
-
 print("authenticate")
 
 # Create a token containing your Twitter keys
@@ -32,12 +27,22 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:StN_News", n = 20, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:RegierungBW", n = 20, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 20, include_rts = F)) %>% 
-  distinct(text, .keep_all = T)
+  distinct(text, .keep_all = T) %>% 
+  filter(created_at > lubridate::now() - lubridate::dhours(3)) 
+
+ts_rows <- nrow(ts) 
+
+if(ts_rows>10){
+  ts <- ts %>% 
+    sample_n(5)
+  
+  ts_rows <- nrow(ts) 
+  
+}
 
 print("schwabify")
 
 ts_schwabs <- ts %>% 
-  filter(created_at > lubridate::now() - lubridate::dhours(3)) %>% 
   rowwise() %>% 
   mutate(schwabtext = get_schwab(text)) %>% 
   ungroup() %>% 
@@ -46,15 +51,7 @@ ts_schwabs <- ts %>%
          schwabtext = paste0(schwabtext, " (@", screen_name, ")"),
          schwabtext = str_replace(schwabtext, " inna", ":inna")) 
 
-ts_rows <- nrow(ts_schwabs) 
 
-if(ts_rows>10){
-  ts_schwabs <- ts_schwabs %>% 
-    sample_n(5)
-  
-  ts_rows <- nrow(ts_schwabs) 
-  
-}
 
 if(ts_rows==0){
   
