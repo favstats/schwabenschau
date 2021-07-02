@@ -28,7 +28,7 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:RegierungBW", n = 20, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 20, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
-  filter(created_at > lubridate::now() - lubridate::dhours(3)) 
+  filter(created_at > lubridate::now() - lubridate::dhours(2)) 
 
 ts_rows <- nrow(ts) 
 
