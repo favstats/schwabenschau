@@ -34,7 +34,7 @@ ts_rows <- nrow(ts)
 
 if(ts_rows>10){
   ts <- ts %>% 
-    sample_n(5)
+    sample_n(10)
   
   ts_rows <- nrow(ts) 
   
@@ -49,7 +49,11 @@ ts_schwabs <- ts %>%
   mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
          schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
          schwabtext = paste0(schwabtext, " (@", screen_name, ")"),
-         schwabtext = str_replace(schwabtext, " inna", ":inna")) 
+         schwabtext = str_replace(schwabtext, " inna", ":inna"),
+         schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
+         schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
+         schwabtext = str_replace(schwabtext, " auch ", " au "),
+         schwabtext = str_replace(schwabtext, "Auch ", "au ")) 
 
 
 
