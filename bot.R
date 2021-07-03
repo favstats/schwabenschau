@@ -32,9 +32,9 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
 
 ts_rows <- nrow(ts) 
 
-if(ts_rows>10){
+if(ts_rows>15){
   ts <- ts %>% 
-    sample_n(10)
+    sample_n(15)
   
   ts_rows <- nrow(ts) 
   
@@ -53,7 +53,7 @@ ts_schwabs <- ts %>%
          schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
          schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
          schwabtext = str_replace(schwabtext, " auch ", " au "),
-         schwabtext = str_replace(schwabtext, "Auch ", "au ")) 
+         schwabtext = str_replace(schwabtext, "Auch ", "Au ")) 
 
 
 
