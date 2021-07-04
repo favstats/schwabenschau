@@ -75,7 +75,7 @@ if(ts_rows==0){
     
     post_tweet(status = .x$schwabtext)
     
-    Sys.sleep(10)
+    Sys.sleep(60)
     
   })
  
