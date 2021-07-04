@@ -53,7 +53,8 @@ ts_schwabs <- ts %>%
          schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
          schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
          schwabtext = str_replace(schwabtext, " auch ", " au "),
-         schwabtext = str_replace(schwabtext, "Auch ", "Au ")) 
+         schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>% 
+  distinct(schwabtext, .keep_all = T)
 
 
 
