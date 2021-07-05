@@ -20,6 +20,9 @@ rtweet::create_token(
 
 print("get tweets")
 
+
+statuses <- readLines("statuses.txt") %>% unique()
+
 ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>% 
   bind_rows(rtweet::search_tweets("from:StZ_NEWS", n = 20, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:SZ", n = 20, include_rts = F)) %>% 
@@ -28,7 +31,8 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:RegierungBW", n = 20, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 20, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
-  filter(created_at > lubridate::now() - lubridate::dhours(2)) 
+  filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
+  filter(!(status_id %in% statuses))
 
 ts_rows <- nrow(ts) 
 
@@ -41,6 +45,7 @@ if(ts_rows>15){
 }
 
 print("schwabify")
+
 
 ts_schwabs <- ts %>% 
   rowwise() %>% 
@@ -56,6 +61,18 @@ ts_schwabs <- ts %>%
          schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>% 
   distinct(schwabtext, .keep_all = T)
 
+statuses <- ts_schwabs %>% 
+  pull(status_id)
+  
+cat(statuses, file = "statuses.txt", sep = "\n", append = T)
+
+
+# original_mentions <- ts_schwabs %>% 
+#   # tidyr::drop_na(mentions_screen_name) %>% View
+#   mutate(mentions = stringr::str_extract_all(text, "@[:alpha:]*"))  %>%
+#   tidyr::unnest(mentions) %>% 
+#   tidyr::drop_na(mentions) %>% 
+#   select(status_id, mentions)
 
 
 if(ts_rows==0){
