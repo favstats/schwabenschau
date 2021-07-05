@@ -61,10 +61,7 @@ ts_schwabs <- ts %>%
          schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>% 
   distinct(schwabtext, .keep_all = T)
 
-statuses <- ts_schwabs %>% 
-  pull(status_id)
-  
-cat(statuses, file = "statuses.txt", sep = "\n", append = T)
+
 
 
 # original_mentions <- ts_schwabs %>% 
@@ -97,7 +94,52 @@ if(ts_rows==0){
     
   })
  
+ statuses <- ts_schwabs %>% 
+   pull(status_id)
+ 
+ cat(statuses, file = "statuses.txt", sep = "\n", append = T)
+ 
 
+}
+
+print("send translation replies")
+
+replies <- readLines("replies.txt")
+
+schwabtweets <- rtweet::get_mentions(n = 200, 
+                      include_rts = F)  %>% 
+  filter(!(status_id %in% replies))
+  
+if (nrow(schwabtweets) == 0){
+  print("No replies.")
+} else {
+  
+  print(paste0("tweet out ", nrow(schwabtweets), " replies."))
+  
+  replytweets <- schwabtweets %>% 
+    rowwise() %>% 
+    mutate(schwabtext = get_schwab(text)) %>% 
+    ungroup() %>% 
+    mutate(schwabtext = str_replace_all(schwabtext, "@schwabenschau", "") %>% 
+             str_squish())
+  
+  replytweets %>% 
+    split(1:nrow(.)) %>% 
+    purrr::walk(~{
+      
+      print(.x$schwabtext)
+      
+      post_tweet(status = .x$schwabtext, in_reply_to_status_id = .x$status_id, auto_populate_reply_metadata = T)
+      
+      Sys.sleep(60)
+      
+    })
+  
+  replies <- replytweets %>% 
+    pull(status_id)
+  
+  cat(replies, file = "replies.txt", sep = "\n", append = T)
+  
 }
 
 
