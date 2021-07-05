@@ -36,9 +36,9 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
 
 ts_rows <- nrow(ts) 
 
-if(ts_rows>15){
+if(ts_rows>10){
   ts <- ts %>% 
-    sample_n(15)
+    sample_n(10)
   
   ts_rows <- nrow(ts) 
   
@@ -108,7 +108,8 @@ replies <- readLines("replies.txt")
 
 schwabtweets <- rtweet::get_mentions(n = 200, 
                       include_rts = F)  %>% 
-  filter(!(status_id %in% replies))
+  filter(!(status_id %in% replies)) %>% 
+  filter(as.Date(created_at) == lubridate::today())
   
 if (nrow(schwabtweets) == 0){
   print("No replies.")
@@ -121,7 +122,10 @@ if (nrow(schwabtweets) == 0){
     mutate(schwabtext = get_schwab(text)) %>% 
     ungroup() %>% 
     mutate(schwabtext = str_replace_all(schwabtext, "@schwabenschau", "") %>% 
-             str_squish())
+             str_squish() %>% paste0(" #schwabify"))
+  
+  post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id, auto_populate_reply_metadata = T)
+  
   
   replytweets %>% 
     split(1:nrow(.)) %>% 
