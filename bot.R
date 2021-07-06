@@ -32,7 +32,8 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 20, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
-  filter(!(status_id %in% statuses))
+  filter(!(status_id %in% statuses)) %>% 
+  filter(is.na(status_in_reply_to_status_id))
 
 ts_rows <- nrow(ts) 
 
@@ -126,7 +127,7 @@ if (nrow(schwabtweets) == 0){
     mutate(schwabtext = str_replace_all(schwabtext, "@schwabenschau", "") %>% 
              str_squish() %>% paste0(" #schwabify"))
   
-  post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id, auto_populate_reply_metadata = T)
+  # post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id, auto_populate_reply_metadata = T)
   
   
   replytweets %>% 
