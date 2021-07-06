@@ -6,6 +6,7 @@ library(stringr)
 library(purrr)
 library(schwabr)
 library(rtweet)
+library(rex)
 
 source("utils.R")
 

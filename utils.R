@@ -68,8 +68,7 @@ replace_links <- function(.data, status = status_id) {
       
       return(.x)
     }) %>% 
-    filter(str_detect(schwabtext, "hddb[^[:space:]]*", negate = T)) %>% 
-    distinct(schwabtext, .keep_all = T)
+    filter(str_detect(schwabtext, "hddb[^[:space:]]*", negate = T))
   
   return(updated_links_dat)
 }
@@ -103,8 +102,7 @@ replace_mentions <- function(.data, status = status_id) {
       .x$schwabtext <- new_text
       
       return(.x)
-    }) %>% 
-    distinct(schwabtext, .keep_all = T)
+    }) 
   
   return(updated_mentions_dat)
 }
