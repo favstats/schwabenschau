@@ -33,7 +33,7 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>%
   distinct(text, .keep_all = T) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
   filter(!(status_id %in% statuses)) %>% 
-  filter(is.na(status_in_reply_to_status_id))
+  filter(is.na(reply_to_status_id))
 
 ts_rows <- nrow(ts) 
 
@@ -112,22 +112,33 @@ schwabtweets <- rtweet::get_mentions(n = 200,
                       tweet_mode = "extended")  %>% 
   filter(!(status_id %in% replies)) %>% 
   filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1)) %>% 
-  filter(is.na(status_in_reply_to_status_id))
+  filter(status_in_reply_to_status_id != "1410272146027433995" | !is.na(status_in_reply_to_status_id))
   
 if (nrow(schwabtweets) == 0){
   print("No replies.")
 } else {
   
+  original_tweets <- rtweet::lookup_tweets(statuses = schwabtweets$status_in_reply_to_status_id)
+  
   print(paste0("tweet out ", nrow(schwabtweets), " replies."))
   
-  replytweets <- schwabtweets %>% 
-    rowwise() %>% 
-    mutate(schwabtext = get_schwab(text)) %>% 
-    ungroup() %>% 
-    mutate(schwabtext = str_replace_all(schwabtext, "@schwabenschau", "") %>% 
-             str_squish() %>% paste0(" #schwabify"))
+  replytweets <- original_tweets %>% 
+    # rowwise() %>% 
+    # mutate(schwabtext = get_schwab(text)) %>% 
+    # ungroup() %>% 
+    mutate(schwabtext = str_replace_all(text, "@schwabenschau", "") %>% 
+             str_squish()) %>% 
+    select(original_id = status_id, schwabtext) %>% 
+    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) %>% 
+    mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
+           schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
+           schwabtext = str_replace(schwabtext, " inna", ":inna"),
+           schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
+           schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
+           schwabtext = str_replace(schwabtext, " auch ", " au "),
+           schwabtext = str_replace(schwabtext, "Auch ", "Au ")) 
   
-  # post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id, auto_populate_reply_metadata = T)
+  # post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id)
   
   
   replytweets %>% 
@@ -136,7 +147,7 @@ if (nrow(schwabtweets) == 0){
       
       print(.x$schwabtext)
       
-      post_tweet(status = .x$schwabtext, in_reply_to_status_id = .x$status_id, auto_populate_reply_metadata = T)
+      post_tweet(status = .x$schwabtext, in_reply_to_status_id = .x$status_id, auto_populate_reply_metadata = F)
       
       Sys.sleep(60)
       
