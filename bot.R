@@ -107,9 +107,11 @@ print("send translation replies")
 replies <- readLines("replies.txt")
 
 schwabtweets <- rtweet::get_mentions(n = 200, 
-                      include_rts = F)  %>% 
+                      include_rts = F,
+                      tweet_mode = "extended")  %>% 
   filter(!(status_id %in% replies)) %>% 
-  filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1))
+  filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1)) %>% 
+  filter(is.na(status_in_reply_to_status_id))
   
 if (nrow(schwabtweets) == 0){
   print("No replies.")
