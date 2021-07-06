@@ -123,21 +123,18 @@ if (nrow(schwabtweets) == 0){
   print(paste0("tweet out ", nrow(schwabtweets), " replies."))
   
   replytweets <- original_tweets %>% 
-    # rowwise() %>% 
-    # mutate(schwabtext = get_schwab(text)) %>% 
-    # ungroup() %>% 
-    mutate(schwabtext = str_replace_all(text, "@schwabenschau", "") %>% 
-             str_squish()) %>% 
-    select(original_id = status_id, schwabtext) %>% 
-    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) %>% 
+    rowwise() %>% 
+    mutate(schwabtext = get_schwab(text)) %>% 
+    ungroup() %>% 
     mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
            schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
            schwabtext = str_replace(schwabtext, " inna", ":inna"),
            schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
            schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
            schwabtext = str_replace(schwabtext, " auch ", " au "),
-           schwabtext = str_replace(schwabtext, "Auch ", "Au ")) 
-  
+           schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>%
+    select(original_id = status_id, schwabtext) %>% 
+    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id))
   # post_tweet(status = replytweets$schwabtext, in_reply_to_status_id = replytweets$status_id)
   
   
