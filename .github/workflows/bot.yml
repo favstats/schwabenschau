@@ -23,6 +23,7 @@ jobs:
         run: |
           install.packages('rtweet')
           install.packages('dplyr')
+          install.packages('tidyr')
           install.packages('lubridate')
           install.packages('remotes')
           remotes::install_github("favstats/schwabr")
