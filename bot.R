@@ -36,6 +36,19 @@ download_imgs <- function(x, media, id) {
 }
 
 
+clean_schwabtext <- function(x){
+  x %>%
+    mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
+           schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
+           schwabtext = str_replace(schwabtext, " inna", ":inna"),
+           schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
+           schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
+           schwabtext = str_replace(schwabtext, " auch ", " au "),
+           schwabtext = str_replace(schwabtext, "Auch ", "Au "),
+           schwabtext = str_remove_all(schwabtext, "hddb[^[:space:]]*"),
+           schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext)) 
+}
+
 
 print("authenticate")
 
@@ -83,16 +96,8 @@ ts_schwabs <- ts %>%
   rowwise() %>% 
   mutate(schwabtext = get_schwab(text)) %>% 
   ungroup() %>% 
-  mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
-         schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
-         # schwabtext = paste0(schwabtext, " (@", screen_name, ")"),
-         schwabtext = str_replace(schwabtext, " inna", ":inna"),
-         schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
-         schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
-         schwabtext = str_replace(schwabtext, " auch ", " au "),
-         schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>% 
-  distinct(schwabtext, .keep_all = T) %>% 
-   mutate(schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext))
+  clean_schwabtext() %>% 
+  distinct(schwabtext, .keep_all = T) 
 
 
 
@@ -170,18 +175,10 @@ if (nrow(schwabtweets) == 0){
   replytweets <- original_tweets %>% 
     rowwise() %>%
     mutate(schwabtext = get_schwab(text)) %>%
-    ungroup() %>%
-    mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
-           schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
-           schwabtext = str_replace(schwabtext, " inna", ":inna"),
-           schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
-           schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
-           schwabtext = str_replace(schwabtext, " auch ", " au "),
-           schwabtext = str_replace(schwabtext, "Auch ", "Au "),
-           schwabtext = str_remove_all(schwabtext, "hddb[^[:space:]]*")) %>%
+    ungroup()  %>% 
+    clean_schwabtext() %>% 
     select(original_id = status_id, schwabtext, contains("media_url")) %>% 
-    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) %>% 
-    mutate(schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext))
+    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) 
   
   
   
