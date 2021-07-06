@@ -109,7 +109,7 @@ replies <- readLines("replies.txt")
 schwabtweets <- rtweet::get_mentions(n = 200, 
                       include_rts = F)  %>% 
   filter(!(status_id %in% replies)) %>% 
-  filter(as.Date(created_at) >= lubridate::today())
+  filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1))
   
 if (nrow(schwabtweets) == 0){
   print("No replies.")
