@@ -178,7 +178,7 @@ if (nrow(schwabtweets) == 0){
            schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
            schwabtext = str_replace(schwabtext, " auch ", " au "),
            schwabtext = str_replace(schwabtext, "Auch ", "Au "),
-           schwabtext = str_remove_all(schwabtext, "http[^[:space:]]*")) %>%
+           schwabtext = str_remove_all(schwabtext, "hddb[^[:space:]]*")) %>%
     select(original_id = status_id, schwabtext, contains("media_url")) %>% 
     left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) %>% 
     mutate(schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext))
@@ -210,7 +210,7 @@ if (nrow(schwabtweets) == 0){
       
       post_tweet(status = .x$schwabtext,
                  in_reply_to_status_id = .x$status_id, 
-                 auto_populate_reply_metadata = F,
+                 auto_populate_reply_metadata = T,
                  media = imgs)
       
       Sys.sleep(60)
