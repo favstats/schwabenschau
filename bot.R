@@ -9,14 +9,17 @@ library(rtweet)
 
 download_imgs <- function(x, media, id) {
   
-  if(!dir.exists("tmp")) dir.create("tmp")
   
   img_dat <- x %>% 
     rename(media_link = {{media}},
            id_status = {{id}}) %>% 
-    drop_na(media_link) 
+    mutate(media_extracted = paste0(media_link, "")) %>% 
+    filter(media_extracted != "NA") 
   
   if(nrow(img_dat)!=0){
+    
+    if(!dir.exists("tmp")) dir.create("tmp")
+    
     img_dat %>% 
       unnest(media_link) %>% 
       split(1:nrow(.)) %>% 
@@ -31,6 +34,7 @@ download_imgs <- function(x, media, id) {
   }
 
 }
+
 
 
 print("authenticate")
@@ -87,7 +91,8 @@ ts_schwabs <- ts %>%
          schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
          schwabtext = str_replace(schwabtext, " auch ", " au "),
          schwabtext = str_replace(schwabtext, "Auch ", "Au ")) %>% 
-  distinct(schwabtext, .keep_all = T)
+  distinct(schwabtext, .keep_all = T) %>% 
+   mutate(schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext))
 
 
 
