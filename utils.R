@@ -70,6 +70,8 @@ replace_links <- function(.data, status = status_id) {
     }) %>% 
     filter(str_detect(schwabtext, "hddb[^[:space:]]*", negate = T))
   
+  if(nrow(updated_links_dat)==0) updated_links_dat <- .data
+  
   return(updated_links_dat)
 }
 
@@ -103,6 +105,8 @@ replace_mentions <- function(.data, status = status_id) {
       
       return(.x)
     }) 
+  
+  if(nrow(updated_mentions_dat)==0) updated_mentions_dat <- .data
   
   return(updated_mentions_dat)
 }
