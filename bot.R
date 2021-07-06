@@ -83,7 +83,7 @@ ts_rows <- nrow(ts)
 
 if(ts_rows>10){
   ts <- ts %>% 
-    sample_n(10)
+    sample_n(5)
   
   ts_rows <- nrow(ts) 
   
