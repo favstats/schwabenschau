@@ -22,6 +22,7 @@ jobs:
       - name: "Install Packages"
         run: |
           install.packages('rtweet')
+          install.packages('rex')
           install.packages('dplyr')
           install.packages('tidyr')
           install.packages('lubridate')

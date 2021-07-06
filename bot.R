@@ -7,48 +7,7 @@ library(purrr)
 library(schwabr)
 library(rtweet)
 
-download_imgs <- function(x, media, id) {
-  
-  
-  img_dat <- x %>% 
-    rename(media_link = {{media}},
-           id_status = {{id}}) %>% 
-    mutate(media_extracted = paste0(media_link, "")) %>% 
-    filter(media_extracted != "NA") 
-  
-  if(nrow(img_dat)!=0){
-    
-    if(!dir.exists("tmp")) dir.create("tmp")
-    
-    img_dat %>% 
-      unnest(media_link) %>% 
-      split(1:nrow(.)) %>% 
-      walk(~{
-        
-        tmp_path <- glue::glue("tmp/{.x$id_status}")
-        
-        if(!dir.exists(tmp_path)) dir.create(tmp_path)
-        
-        download.file(.x$media_link, glue::glue("{tmp_path}/{basename(.x$media_link)}"), mode = "wb")
-      })
-  }
-
-}
-
-
-clean_schwabtext <- function(x){
-  x %>%
-    mutate(link = stringr::str_extract(text, "http[^[:space:]]*"),
-           schwabtext = stringr::str_replace(schwabtext, "hddb[^[:space:]]*", link),
-           schwabtext = str_replace(schwabtext, " inna", ":inna"),
-           schwabtext = str_replace(schwabtext, " ungern ", " ogern "),
-           schwabtext = str_replace(schwabtext, "Ungern ", "Ogern "),
-           schwabtext = str_replace(schwabtext, " auch ", " au "),
-           schwabtext = str_replace(schwabtext, "Auch ", "Au "),
-           schwabtext = str_remove_all(schwabtext, "hddb[^[:space:]]*"),
-           schwabtext = ifelse(str_count(schwabtext > 280), str_trunc(schwabtext, 280), schwabtext)) 
-}
-
+source("utils.R")
 
 print("authenticate")
 
@@ -61,9 +20,7 @@ rtweet::create_token(
   access_secret = Sys.getenv("secret")
 )
 
-
 print("get tweets")
-
 
 statuses <- readLines("statuses.txt") %>% unique()
 
@@ -83,9 +40,6 @@ ts_rows <- nrow(ts)
 if(ts_rows>10){
   ts <- ts %>% 
     sample_n(5)
-  
-  ts_rows <- nrow(ts) 
-  
 }
 
 print("schwabify")
@@ -96,49 +50,27 @@ ts_schwabs <- ts %>%
   mutate(schwabtext = get_schwab(text)) %>% 
   ungroup() %>% 
   clean_schwabtext() %>% 
-  distinct(schwabtext, .keep_all = T) 
+  distinct(schwabtext, .keep_all = T) %>% 
+  replace_links() %>% 
+  replace_mentions() %>% 
+  distinct(status_id, .keep_all = T) 
 
-
-
-
-# original_mentions <- ts_schwabs %>% 
-#   # tidyr::drop_na(mentions_screen_name) %>% View
-#   mutate(mentions = stringr::str_extract_all(text, "@[:alpha:]*"))  %>%
-#   tidyr::unnest(mentions) %>% 
-#   tidyr::drop_na(mentions) %>% 
-#   select(status_id, mentions)
-
+ts_rows <- nrow(ts) 
 
 if(ts_rows==0){
   
-    print("nothing to tweet")
+  print("nothing to tweet")
   
 } else {
   print(paste0("tweet out ", ts_rows, " tweets."))
   
   # post_tweet(status = ts_schwabs$schwabtext[1], in_reply_to_status_id = ts_schwabs$status_id[1], auto_populate_reply_metadata = T)
 
-  
  ts_schwabs %>% 
   split(1:nrow(.)) %>% 
   purrr::walk(~{
     
     print(.x$schwabtext)
-    
-    .x %>% 
-      download_imgs(media_url, status_id)
-    
-    img_path <- glue::glue("tmp/{.x$status_id}")
-    
-    if(dir.exists(img_path)){
-      
-      imgs <- dir(img_path, full.names = T)
-      
-    } else {
-      
-      imgs <- NULL
-      
-    }  
     
     post_tweet(status = .x$schwabtext)
     
@@ -175,11 +107,12 @@ if (nrow(schwabtweets) == 0){
     rowwise() %>%
     mutate(schwabtext = get_schwab(text)) %>%
     ungroup()  %>% 
-    clean_schwabtext() %>% 
+    clean_schwabtext()  %>% 
+    replace_links() %>% 
+    replace_mentions() %>% 
     select(original_id = status_id, schwabtext, contains("media_url")) %>% 
-    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id)) 
-  
-  
+    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id))  %>% 
+    distinct(status_id, .keep_all = T) 
   
   print(paste0("tweet out ", nrow(replytweets), " replies."))
   
@@ -188,26 +121,10 @@ if (nrow(schwabtweets) == 0){
     purrr::walk(~{
       
       print(.x$schwabtext)
-      
-      .x %>% 
-        download_imgs(media_url, original_id)
-      
-      img_path <- glue::glue("tmp/{.x$original_id}")
-      
-      if(dir.exists(img_path)){
-        
-        imgs <- dir(img_path, full.names = T)
-        
-      } else {
-        
-        imgs <- NULL
-        
-      }
-      
+
       post_tweet(status = .x$schwabtext,
                  in_reply_to_status_id = .x$status_id, 
-                 auto_populate_reply_metadata = T,
-                 media = imgs)
+                 auto_populate_reply_metadata = T)
       
       Sys.sleep(60)
       
@@ -219,7 +136,4 @@ if (nrow(schwabtweets) == 0){
   cat(replies, file = "replies.txt", sep = "\n", append = T)
   
 }
-
-
-unlink("tmp", recursive = T)
 
