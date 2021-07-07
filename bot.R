@@ -41,51 +41,55 @@ ts_rows <- nrow(ts)
 if(ts_rows>10){
   ts <- ts %>% 
     sample_n(5)
-}
-
-print("schwabify")
-
-
-ts_schwabs <- ts %>% 
-  rowwise() %>% 
-  mutate(schwabtext = get_schwab(text)) %>% 
-  ungroup() %>% 
-  clean_schwabtext() %>% 
-  distinct(schwabtext, .keep_all = T) %>% 
-  replace_links() %>% 
-  replace_mentions() %>% 
-  distinct(status_id, .keep_all = T) 
-
-ts_rows <- nrow(ts) 
+} 
 
 if(ts_rows==0){
   
   print("nothing to tweet")
   
 } else {
-  print(paste0("tweet out ", ts_rows, " tweets."))
   
-  # post_tweet(status = ts_schwabs$schwabtext[1], in_reply_to_status_id = ts_schwabs$status_id[1], auto_populate_reply_metadata = T)
+  print("schwabify")
+  
+  
+  ts_schwabs <- ts %>% 
+    rowwise() %>% 
+    mutate(schwabtext = get_schwab(text)) %>% 
+    ungroup() %>% 
+    clean_schwabtext() %>% 
+    distinct(schwabtext, .keep_all = T) %>% 
+    replace_links() %>% 
+    replace_mentions() %>% 
+    distinct(status_id, .keep_all = T) 
+  
+  ts_rows <- nrow(ts_schwabs) 
 
- ts_schwabs %>% 
-  split(1:nrow(.)) %>% 
-  purrr::walk(~{
+  print(paste0("tweet out ", ts_rows, " tweets."))
     
-    print(.x$schwabtext)
+    # post_tweet(status = ts_schwabs$schwabtext[1], in_reply_to_status_id = ts_schwabs$status_id[1], auto_populate_reply_metadata = T)
     
-    post_tweet(status = .x$schwabtext)
+  ts_schwabs %>% 
+    split(1:nrow(.)) %>% 
+    purrr::walk(~{
+        
+        print(.x$schwabtext)
+        
+        post_tweet(status = .x$schwabtext)
+        
+        Sys.sleep(60)
+        
+      })
     
-    Sys.sleep(60)
+    statuses <- ts_schwabs %>% 
+      pull(status_id)
     
-  })
- 
- statuses <- ts_schwabs %>% 
-   pull(status_id)
- 
- cat(statuses, file = "statuses.txt", sep = "\n", append = T)
- 
+    cat(statuses, file = "statuses.txt", sep = "\n", append = T)
+    
+    
+} 
 
-}
+
+
 
 print("send translation replies")
 
