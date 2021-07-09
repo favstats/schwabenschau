@@ -62,7 +62,8 @@ if(ts_rows==0){
     distinct(schwabtext, .keep_all = T) %>% 
     replace_links() %>% 
     replace_mentions() %>% 
-    distinct(status_id, .keep_all = T) 
+    distinct(status_id, .keep_all = T)  %>% 
+    mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&"))
   
   ts_rows <- nrow(ts_schwabs) 
 
@@ -119,7 +120,8 @@ if (nrow(schwabtweets) == 0){
     replace_mentions() %>% 
     select(original_id = status_id, schwabtext, contains("media_url")) %>% 
     left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id))  %>% 
-    distinct(status_id, .keep_all = T) 
+    distinct(status_id, .keep_all = T) %>% 
+    mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&"))
   
   print(paste0("tweet out ", nrow(replytweets), " replies."))
   

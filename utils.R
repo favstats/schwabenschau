@@ -44,69 +44,78 @@ replace_links <- function(.data, status = status_id) {
     mutate(links = stringr::str_extract_all(text, "http[^[:space:]]*")) %>% 
     unnest(links) 
   
-  schwab_links <- .data %>%  
-    mutate(schwablinks = stringr::str_extract_all(schwabtext, "hddb[^[:space:]]*")) %>% 
-    unnest(schwablinks) %>% 
-    select(schwablinks)
-  
-  updated_links_dat <- links_dat %>% 
-    bind_cols(schwab_links) %>% 
-    rowwise() %>% 
-    mutate(schwablinks = rex::rex(schwablinks)) %>% 
-    ungroup() %>% 
-    group_split( {{status}} ) %>% 
-    map_dfr(~{
-      
-      new_text <- .x$schwabtext[1]
-      
-      for (jj in seq_along(1:nrow(.x))) {
-        new_text <- str_replace_all(new_text, .x$schwablinks[jj], .x$links[jj])
+  if(nrow(links_dat)!=0){
+    schwab_links <- .data %>%  
+      mutate(schwablinks = stringr::str_extract_all(schwabtext, "hddb[^[:space:]]*")) %>% 
+      unnest(schwablinks) %>% 
+      select(schwablinks)
+    
+    updated_links_dat <- links_dat %>% 
+      bind_cols(schwab_links) %>% 
+      rowwise() %>% 
+      mutate(schwablinks = rex::rex(schwablinks)) %>% 
+      ungroup() %>% 
+      group_split( {{status}} ) %>% 
+      map_dfr(~{
         
-      }
-      
-      .x$schwabtext <- new_text
-      
-      return(.x)
-    }) %>% 
-    filter(str_detect(schwabtext, "hddb[^[:space:]]*", negate = T))
-  
-  if(nrow(updated_links_dat)==0) updated_links_dat <- .data
+        new_text <- .x$schwabtext[1]
+        
+        for (jj in seq_along(1:nrow(.x))) {
+          new_text <- str_replace_all(new_text, .x$schwablinks[jj], .x$links[jj])
+          
+        }
+        
+        .x$schwabtext <- new_text
+        
+        return(.x)
+      }) %>% 
+      filter(str_detect(schwabtext, "hddb[^[:space:]]*", negate = T))
+    
+    if(nrow(updated_links_dat)==0) updated_links_dat <- .data    
+  } else {
+    updated_links_dat <- .data  
+  }
   
   return(updated_links_dat)
 }
 
 replace_mentions <- function(.data, status = status_id) {
   
-  mentions_dat <- .data %>% 
-    mutate(mentions = stringr::str_extract_all(text, "@[^[:space:]]*")) %>% 
-    unnest(mentions) 
-  
-  schwab_mentions_dat <- .data %>%  
-    mutate(schwab_mentions = stringr::str_extract_all(schwabtext, "@[^[:space:]]*")) %>% 
-    unnest(schwab_mentions) %>% 
-    select(schwab_mentions)
-  
-  updated_mentions_dat <- mentions_dat %>% 
-    bind_cols(schwab_mentions_dat) %>% 
-    rowwise() %>% 
-    mutate(schwab_mentions = rex::rex(schwab_mentions)) %>% 
-    ungroup() %>% 
-    group_split( {{status}} ) %>% 
-    map_dfr(~{
+    mentions_dat <- .data %>% 
+      mutate(mentions = stringr::str_extract_all(text, "@[^[:space:]]*")) %>% 
+      unnest(mentions) 
+    
+    if(nrow(mentions_dat)!=0){    
+      schwab_mentions_dat <- .data %>%  
+        mutate(schwab_mentions = stringr::str_extract_all(schwabtext, "@[^[:space:]]*")) %>% 
+        unnest(schwab_mentions) %>% 
+        select(schwab_mentions)
       
-      new_text <- .x$schwabtext[1]
-      
-      for (jj in seq_along(1:nrow(.x))) {
-        new_text <- str_replace_all(new_text, .x$schwab_mentions[jj], .x$mentions[jj])
+      updated_mentions_dat <- mentions_dat %>% 
+        bind_cols(schwab_mentions_dat) %>% 
+        rowwise() %>% 
+        mutate(schwab_mentions = rex::rex(schwab_mentions)) %>% 
+        ungroup() %>% 
+        group_split( {{status}} ) %>% 
+        map_dfr(~{
         
-      }
+        new_text <- .x$schwabtext[1]
+        
+        for (jj in seq_along(1:nrow(.x))) {
+          new_text <- str_replace_all(new_text, .x$schwab_mentions[jj], .x$mentions[jj])
+          
+        }
+        
+        .x$schwabtext <- new_text
+        
+        return(.x)
+      }) 
+    
+      if(nrow(updated_mentions_dat)==0) updated_mentions_dat <- .data
+    } else {
       
-      .x$schwabtext <- new_text
-      
-      return(.x)
-    }) 
-  
-  if(nrow(updated_mentions_dat)==0) updated_mentions_dat <- .data
-  
+      updated_mentions_dat <- .data  
+  }
+    
   return(updated_mentions_dat)
 }
