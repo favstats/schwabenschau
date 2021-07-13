@@ -103,7 +103,7 @@ schwabtweets <- rtweet::get_mentions(n = 200,
                       tweet_mode = "extended")  %>% 
   filter(!(status_id %in% replies)) %>% 
   filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1)) %>% 
-  filter(status_in_reply_to_status_id != "1410272146027433995" | !is.na(status_in_reply_to_status_id))
+  filter(status_in_reply_to_user_id != "1410272146027433995" | !is.na(status_in_reply_to_status_id))
   
 if (nrow(schwabtweets) == 0){
   print("No replies.")
