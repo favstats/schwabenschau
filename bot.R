@@ -45,6 +45,10 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 10, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:Uni_Stuttgart", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:KM_BW", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:UmweltBW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:visitbawu", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:FinanzenBW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:Landtag_BW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:enjoy_stuttgart", n = 10, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
   filter(!(status_id %in% statuses)) %>% 
