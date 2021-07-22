@@ -40,7 +40,6 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 10, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:PolizeiAalen", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:MSI_BW", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:LkaBaWue", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:BWjetzt", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:PolizeiRT", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:WM_BW", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:Uni_Stuttgart", n = 10, include_rts = F)) %>% 
