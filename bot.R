@@ -25,14 +25,27 @@ print("get tweets")
 
 statuses <- readLines("statuses.txt") %>% unique()
 
-ts <- rtweet::search_tweets("from:tagesschau", n = 20, include_rts = F) %>% 
-  bind_rows(rtweet::search_tweets("from:StZ_NEWS", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:SZ", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:Schwaebische", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:stuttgart_stadt", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:BWjetzt", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:RegierungBW", n = 20, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 20, include_rts = F)) %>% 
+ts <- rtweet::search_tweets("from:tagesschau", n = 10, include_rts = F) %>% 
+  bind_rows(rtweet::search_tweets("from:StZ_NEWS", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:SZ", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:Schwaebische", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:stuttgart_stadt", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:BWjetzt", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:RegierungBW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:PolizeiUL", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:PolizeiHN", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:PolizeiLB", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:bpol_bw", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:PolizeiAalen", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:MSI_BW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:LkaBaWue", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:BWjetzt", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:PolizeiRT", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:WM_BW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:Uni_Stuttgart", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:KM_BW", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:UmweltBW", n = 10, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
   filter(!(status_id %in% statuses)) %>% 
@@ -98,7 +111,7 @@ print("send translation replies")
 
 replies <- readLines("replies.txt")
 
-schwabtweets <- rtweet::get_mentions(n = 200, 
+schwabtweets <- rtweet::get_mentions(n = 100, 
                                      include_rts = F,
                                      tweet_mode = "extended")  %>% 
   filter(!(status_id %in% replies)) %>% 
