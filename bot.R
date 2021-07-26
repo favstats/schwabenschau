@@ -49,6 +49,7 @@ ts <- rtweet::search_tweets("from:tagesschau", n = 10, include_rts = F) %>%
   bind_rows(rtweet::search_tweets("from:FinanzenBW", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:Landtag_BW", n = 10, include_rts = F)) %>% 
   bind_rows(rtweet::search_tweets("from:enjoy_stuttgart", n = 10, include_rts = F)) %>% 
+  bind_rows(rtweet::search_tweets("from:jensspahn", n = 10, include_rts = F)) %>% 
   distinct(text, .keep_all = T) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
   filter(!(status_id %in% statuses)) %>% 
