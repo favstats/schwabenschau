@@ -44,6 +44,9 @@ replace_links <- function(.data, status = status_id) {
     mutate(links = stringr::str_extract_all(text, "http[^[:space:]]*")) %>% 
     unnest(links) 
   
+  print("links_dat")
+  print(links_dat)
+  
   if(nrow(links_dat)!=0){
     schwab_links <- .data %>%  
       mutate(schwablinks = stringr::str_extract_all(schwabtext, "hddb[^[:space:]]*")) %>% 
@@ -84,6 +87,9 @@ replace_mentions <- function(.data, status = status_id) {
     mentions_dat <- .data %>% 
       mutate(mentions = stringr::str_extract_all(text, "@[^[:space:]]*")) %>% 
       unnest(mentions) 
+    
+    print("mentions_dat")
+    print(mentions_dat)
     
     if(nrow(mentions_dat)!=0){    
       schwab_mentions_dat <- .data %>%  
