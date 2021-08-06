@@ -26,8 +26,8 @@ jobs:
           install.packages('dplyr')
           install.packages('tidyr')
           install.packages('lubridate')
-          install.packages('devtools')
-          devtools::install_github("favstats/schwabr")
+          install.packages('remotes')
+          remotes::install_github("favstats/schwabr")
           install.packages('stringr')
           install.packages('purrr')
         shell: Rscript {0}
