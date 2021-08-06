@@ -4,11 +4,12 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 library(purrr)
-library(schwabr)
 library(rtweet)
 library(rex)
+library(rvest)
 
 source("utils.R")
+source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
 
 print("authenticate")
 
@@ -70,16 +71,22 @@ if(ts_rows==0){
   
   print("schwabify")
   
-  
   ts_schwabs <- ts %>% 
+    print_data %>% 
     rowwise() %>% 
     mutate(schwabtext = get_schwab(text)) %>% 
+    print_data %>% 
     ungroup() %>% 
     clean_schwabtext() %>% 
+    print_data %>% 
     distinct(schwabtext, .keep_all = T) %>% 
+    print_data %>% 
     replace_links() %>% 
+    print_data %>% 
     replace_mentions() %>% 
+    print_data %>% 
     distinct(status_id, .keep_all = T)  %>% 
+    print_data %>% 
     mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&"))
   
   ts_rows <- nrow(ts_schwabs) 
