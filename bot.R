@@ -4,9 +4,9 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 library(purrr)
+library(rvest)
 library(rtweet)
 library(rex)
-library(rvest)
 
 source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
@@ -70,6 +70,8 @@ if(ts_rows==0){
 } else {
   
   print("schwabify")
+  
+
   
   ts_schwabs <- ts %>% 
     print_data %>% 

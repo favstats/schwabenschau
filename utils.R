@@ -119,3 +119,10 @@ replace_mentions <- function(.data, status = status_id) {
     
   return(updated_mentions_dat)
 }
+
+
+print_data <- function(x) {
+  print(x)
+  res <<- x
+  return(x)
+}
