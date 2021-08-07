@@ -13,6 +13,7 @@ source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
 
 source("https://raw.githubusercontent.com/rstudio/webshot2/master/R/webshot.R")
+source("https://raw.githubusercontent.com/rstudio/webshot2/master/R/utils.R")
 
 
 print("authenticate")
