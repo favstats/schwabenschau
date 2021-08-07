@@ -202,6 +202,10 @@ if (nrow(schwabtweets) == 0){
   
 }
 
+print(lubridate::now())
+
+print(lubridate::hour(lubridate::now()))
+
 if(lubridate::hour(lubridate::now()) %in% c(18:22)){
   
   install.packages("telegram.bot")
