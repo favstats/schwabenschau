@@ -132,3 +132,31 @@ print_data <- function(x) {
   res <<- x
   return(x)
 }
+
+
+get_tweet_screenshots <- function(id, s = "#image_result > div:nth-child(2) > div:nth-child(1) > img", d = 10, r = F){
+  
+  if(r){
+    sels <- c(
+      "#image_result > div:nth-child(1) > div:nth-child(1) > img",
+      "#image_result > div:nth-child(1) > div:nth-child(2) > img",
+      "#image_result > div:nth-child(2) > div:nth-child(1) > img",
+      "#image_result > div:nth-child(2) > div:nth-child(2) > img",
+      "#image_result > div:nth-child(3) > div:nth-child(1) > img",
+      "#image_result > div:nth-child(3) > div:nth-child(2) > img",
+      "#image_result > div:nth-child(4) > div:nth-child(1) > img",
+      "#image_result > div:nth-child(4) > div:nth-child(2) > img"
+      )
+    
+    s <- sample(sels, 1)
+  }
+  
+  webshot2::webshot(paste0("https://www.bannerbear.com/demos/tweetagram/?tweet_id=", id),
+                    selector = s, 
+                    file = paste0("img/", id, ".png"),
+                    zoom = 2, delay = d) 
+}
+
+# get_tweet_screenshots(1423889471808802816)
+
+

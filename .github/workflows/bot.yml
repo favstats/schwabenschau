@@ -28,7 +28,8 @@ jobs:
           install.packages('lubridate')
           install.packages('rvest')
           install.packages('stringr')
-          install.packages('purrr')
+          install.packages('purrr')          
+          remotes::install_github("rstudio/webshot2")
         shell: Rscript {0}
       - name: "Bot - Run"
         run: Rscript 'bot.R'

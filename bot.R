@@ -71,16 +71,16 @@ if(ts_rows==0){
   
   print("schwabify")
   
-
+  if(!dir.exists("img")) dir.create("img")
   
   ts_schwabs <- ts %>% 
-    print_data %>% 
+    # print_data %>% 
     rowwise() %>% 
     mutate(schwabtext = get_schwab(text)) %>% 
-    print_data %>% 
+    # print_data %>% 
     ungroup() %>% 
     clean_schwabtext() %>% 
-    print_data %>% 
+    # print_data %>% 
     distinct(schwabtext, .keep_all = T) %>% 
     print_data %>% 
     replace_links() %>% 
@@ -102,8 +102,11 @@ if(ts_rows==0){
     purrr::walk(~{
         
         print(.x$schwabtext)
+      
+        get_tweet_screenshots(.x$status_id)
         
-        post_tweet(status = .x$schwabtext)
+        post_tweet(status = .x$schwabtext,
+                   media = paste0("img/", .x$status_id, ".png"))
         
         Sys.sleep(60)
         
@@ -174,4 +177,79 @@ if (nrow(schwabtweets) == 0){
   cat(replies, file = "replies.txt", sep = "\n", append = T)
   
 }
+
+if(lubridate::hour(lubridate::now()) %in% c(17:22)){
+  
+  install.packages("telegram.bot")
+  
+  library(telegram.bot)
+  library(webshot2)
+  
+  if(!dir.exists("img")) dir.create("img")
+  
+  token <- Sys.getenv("schwabenschau_token")  
+  
+  bot <- Bot(token = token)
+
+  adam <- Sys.getenv("adam_telegram")  
+  
+  statuses_telegram <- readLines("telegram.txt") %>% unique()
+
+  my_tweets <- rtweet::get_timeline("schwabenschau", n = 100) %>% 
+    distinct(text, .keep_all = T) %>% 
+    filter(created_at > lubridate::now() - lubridate::dhours(12)) %>% 
+    filter(!(status_id %in% statuses_telegram)) %>% 
+    sample_n(3, replace = 3) %>% 
+    distinct(text, .keep_all = T) %>% 
+    mutate(tweet_url = paste0("https://twitter.com/schwabenschau/status/", status_id))
+  
+  my_tweets %>% 
+    split(1:nrow(.)) %>% 
+    purrr::walk(~{
+      
+      
+      try({
+        print(.x$text)
+        
+        print("get screenshot")
+        
+        if(!file.exists(paste0("img/", .x$status_id, ".png"))){
+          get_tweet_screenshots(.x$status_id, 
+                                s = "#image_result > div:nth-child(3) > div:nth-child(2) > img",
+                                d = 20)
+          
+        }
+        
+        
+        print("send photo")
+        
+        bot$sendPhoto(
+          chat_id = adam,
+          photo = paste0("img/", .x$status_id, ".png"),
+          caption	= .x$tweet_url
+        )  
+        
+        print("jetzt sleeped er")
+        
+        Sys.sleep(10)        
+      })
+
+      
+    })
+  
+  telegram_posts <- my_tweets %>% 
+    pull(status_id)
+  
+  cat(telegram_posts, file = "telegram.txt", sep = "\n", append = T)
+  
+  
+}
+
+
+if(dir.exists("img")) unlink("img", recursive=TRUE)
+
+# https://pikaso.me/pricing
+# https://tweetpik.com/dashboard
+# https://www.bannerbear.com/demos/tweetagram?tweet_id=1423889471808802816
+# #image_result > div:nth-child(3) > div:nth-child(2) > img
 
