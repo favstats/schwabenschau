@@ -12,6 +12,12 @@ library(processx)
 library(jsonlite)
 library(fastmap)
 library(later)
+library(websocket)
+library(promises)
+library(rlang)
+library(curl)
+
+
 
 rvest::read_html("https://github.com/rstudio/chromote/tree/master/R") %>% 
   rvest::html_elements(".Box-row") %>% 
