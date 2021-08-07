@@ -7,7 +7,7 @@ library(purrr)
 library(rvest)
 library(rtweet)
 library(rex)
-
+library(chromote)
 
 source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
