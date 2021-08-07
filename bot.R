@@ -12,7 +12,7 @@ library(rex)
 source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
 
-source("https://github.com/rstudio/webshot2/blob/master/R/webshot.R")
+source("https://raw.githubusercontent.com/rstudio/webshot2/master/R/webshot.R")
 
 
 print("authenticate")
@@ -182,7 +182,7 @@ if (nrow(schwabtweets) == 0){
   
 }
 
-if(lubridate::hour(lubridate::now()) %in% c(17:22)){
+if(lubridate::hour(lubridate::now()) %in% c(18:22)){
   
   install.packages("telegram.bot")
   
