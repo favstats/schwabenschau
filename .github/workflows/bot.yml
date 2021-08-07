@@ -29,7 +29,15 @@ jobs:
           install.packages('rvest')
           install.packages('stringr')
           install.packages('purrr')          
-          install.packages('chromote')          
+          install.packages('curl')       
+          install.packages('jsonlite')  
+          install.packages('websocket')   
+          install.packages('processx')    
+          install.packages('R6')   
+          install.packages('later')   
+          install.packages('promises')   
+          install.packages('fastmap')   
+          install.packages('rlang')   
         shell: Rscript {0}
       - name: "Bot - Run"
         run: Rscript 'bot.R'

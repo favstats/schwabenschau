@@ -7,7 +7,16 @@ library(purrr)
 library(rvest)
 library(rtweet)
 library(rex)
-library(chromote)
+library(R6)
+
+rvest::read_html("https://github.com/rstudio/chromote/tree/master/R") %>% 
+  rvest::html_elements(".Box-row") %>% 
+  rvest::html_elements(".flex-auto") %>% 
+  rvest::html_elements(".js-navigation-open") %>% 
+  rvest::html_text() %>% 
+  .[str_detect(., "\\.R")] %>% 
+  paste0("https://raw.githubusercontent.com/rstudio/chromote/master/R/", .) %>% 
+  walk(source)
 
 source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
