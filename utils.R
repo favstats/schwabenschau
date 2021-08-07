@@ -151,7 +151,7 @@ get_tweet_screenshots <- function(id, s = "#image_result > div:nth-child(2) > di
     s <- sample(sels, 1)
   }
   
-  webshot2::webshot(paste0("https://www.bannerbear.com/demos/tweetagram/?tweet_id=", id),
+  webshot(paste0("https://www.bannerbear.com/demos/tweetagram/?tweet_id=", id),
                     selector = s, 
                     file = paste0("img/", id, ".png"),
                     zoom = 2, delay = d) 

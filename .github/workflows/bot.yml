@@ -29,8 +29,7 @@ jobs:
           install.packages('rvest')
           install.packages('stringr')
           install.packages('purrr')          
-          install.packages('remotes')          
-          remotes::install_github("rstudio/webshot2")
+          install.packages('chromotes')          
         shell: Rscript {0}
       - name: "Bot - Run"
         run: Rscript 'bot.R'

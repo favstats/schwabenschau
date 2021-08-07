@@ -8,8 +8,12 @@ library(rvest)
 library(rtweet)
 library(rex)
 
+
 source("utils.R")
 source("https://raw.githubusercontent.com/favstats/schwabr/master/R/connect.R")
+
+source("https://github.com/rstudio/webshot2/blob/master/R/webshot.R")
+
 
 print("authenticate")
 
@@ -183,7 +187,6 @@ if(lubridate::hour(lubridate::now()) %in% c(17:22)){
   install.packages("telegram.bot")
   
   library(telegram.bot)
-  library(webshot2)
   
   if(!dir.exists("img")) dir.create("img")
   
