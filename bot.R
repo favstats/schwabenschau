@@ -8,6 +8,7 @@ library(rvest)
 library(rtweet)
 library(rex)
 library(R6)
+library(processx)
 
 rvest::read_html("https://github.com/rstudio/chromote/tree/master/R") %>% 
   rvest::html_elements(".Box-row") %>% 
