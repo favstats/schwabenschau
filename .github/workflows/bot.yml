@@ -39,6 +39,8 @@ jobs:
           consumer_secret: ${{ secrets.CONSUMER_SECRET }}
           token: ${{ secrets.TOKEN }}
           secret: ${{ secrets.SECRET }}
+          schwabenschau_token: ${{ secrets.SCHWABENSCHAU_TOKEN }}
+          adam_telegram: ${{ secrets.ADAM_TELEGRAM }}
       - name: "Commit"
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
