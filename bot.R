@@ -206,7 +206,7 @@ print(lubridate::now())
 
 print(lubridate::hour(lubridate::now()))
 
-if(lubridate::wday(lubridate::now()) %in% sample(1:7,size = 1)){
+if(lubridate::wday(lubridate::now()) %in% sample(1:365, size = 1)){
   
   install.packages("telegram.bot")
   
