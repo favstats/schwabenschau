@@ -86,6 +86,10 @@ ts <- schwabenbase %>%
   filter(!(id %in% statuses)) %>% 
   filter(is.na(in_reply_to_status_id))
 
+
+post_tweet <- purrr::possibly(post_tweet, otherwise = NULL, quiet = F)
+
+
 ts_rows <- nrow(ts) 
 
 if(ts_rows>10){

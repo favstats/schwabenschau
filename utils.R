@@ -134,7 +134,7 @@ print_data <- function(x) {
 }
 
 
-get_tweet_screenshots <- function(id, s = "#image_result > div:nth-child(2) > div:nth-child(1) > img", d = 10, r = F){
+get_tweet_screenshots <- function(id, s = "#image_result > div:nth-child(2) > div:nth-child(1) > img", d = 10, r = F, zoom_in = 2){
   
   if(r){
     sels <- c(
@@ -154,9 +154,15 @@ get_tweet_screenshots <- function(id, s = "#image_result > div:nth-child(2) > di
   webshot(paste0("https://www.bannerbear.com/demos/tweetagram/?tweet_id=", id),
                     selector = s, 
                     file = paste0("img/", id, ".png"),
-                    zoom = 2, delay = d) 
+                    zoom = zoom_in, delay = d) 
 }
 
-# get_tweet_screenshots(1423889471808802816)
+get_tweet_screenshots <- purrr::possibly(get_tweet_screenshots, otherwise = NULL, quiet = F)
+
+
+
+
+
+# get_tweet_screenshots(1423889471808802816, zoom_in = 2)
 
 
