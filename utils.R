@@ -38,7 +38,7 @@ clean_schwabtext <- function(x){
 }
 
 
-replace_links <- function(.data, status = status_id) {
+replace_links <- function(.data, status = id) {
   
   links_dat <- .data %>% 
     mutate(links = stringr::str_extract_all(text, "http[^[:space:]]*")) %>% 
@@ -82,7 +82,7 @@ replace_links <- function(.data, status = status_id) {
   return(updated_links_dat)
 }
 
-replace_mentions <- function(.data, status = status_id) {
+replace_mentions <- function(.data, status = id) {
   
     mentions_dat <- .data %>% 
       mutate(mentions = stringr::str_extract_all(text, "@[^[:space:]]*")) %>% 

@@ -50,35 +50,41 @@ print("get tweets")
 
 statuses <- readLines("statuses.txt") %>% unique()
 
-ts <- rtweet::search_tweets("from:tagesschau", n = 10, include_rts = F) %>% 
-  bind_rows(rtweet::search_tweets("from:StZ_NEWS", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:SZ", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:Schwaebische", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:stuttgart_stadt", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:BWjetzt", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:RegierungBW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:SWRAktuellBW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:PolizeiUL", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:PolizeiHN", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:PolizeiLB", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:bpol_bw", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:PolizeiAalen", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:MSI_BW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:LkaBaWue", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:PolizeiRT", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:WM_BW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:Uni_Stuttgart", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:KM_BW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:UmweltBW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:visitbawu", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:FinanzenBW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:Landtag_BW", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:enjoy_stuttgart", n = 10, include_rts = F)) %>% 
-  bind_rows(rtweet::search_tweets("from:jensspahn", n = 10, include_rts = F)) %>% 
+schwabenbase <- c("from:tagesschau",
+"from:StZ_NEWS", 
+"from:SZ", 
+"from:Schwaebische", 
+"from:stuttgart_stadt",
+"from:BWjetzt", 
+"from:RegierungBW", 
+"from:SWRAktuellBW", 
+"from:PolizeiUL",  
+"from:PolizeiHN",  
+"from:PolizeiLB",  
+"from:bpol_bw", 
+"from:PolizeiAalen", 
+"from:MSI_BW", 
+"from:LkaBaWue", 
+"from:PolizeiRT",  
+"from:WM_BW",  
+"from:Uni_Stuttgart", 
+"from:KM_BW",  
+"from:UmweltBW", 
+"from:visitbawu",  
+"from:FinanzenBW", 
+"from:Landtag_BW", 
+"from:enjoy_stuttgart")
+
+ts <- schwabenbase %>% 
+  map_dfr(~{
+    print(.x)
+    rtweet::search_tweets(.x, n = 10, include_rts = F) %>% mutate_all(as.character)
+    }) %>% 
   distinct(text, .keep_all = T) %>% 
+  mutate(created_at = lubridate::ymd_hms(created_at)) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
-  filter(!(status_id %in% statuses)) %>% 
-  filter(is.na(reply_to_status_id))
+  filter(!(id %in% statuses)) %>% 
+  filter(is.na(in_reply_to_status_id))
 
 ts_rows <- nrow(ts) 
 
@@ -111,7 +117,7 @@ if(ts_rows==0){
     print_data %>% 
     replace_mentions() %>% 
     print_data %>% 
-    distinct(status_id, .keep_all = T)  %>% 
+    distinct(id, .keep_all = T)  %>% 
     print_data %>% 
     mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&"))
   
@@ -127,17 +133,19 @@ if(ts_rows==0){
         
         print(.x$schwabtext)
       
-        get_tweet_screenshots(.x$status_id)
+        get_tweet_screenshots(.x$id)
+        
+        # print(paste0("img/", as.character(.x$id), ".png"))
         
         post_tweet(status = .x$schwabtext,
-                   media = paste0("img/", .x$status_id, ".png"))
+                   media = paste0("img/", as.character(.x$id), ".png"), media_alt_text = .x$schwabtext)
         
         Sys.sleep(60)
         
       })
     
     statuses <- ts_schwabs %>% 
-      pull(status_id)
+      pull(id)
     
     cat(statuses, file = "statuses.txt", sep = "\n", append = T)
     
@@ -151,21 +159,25 @@ print("send translation replies")
 
 replies <- readLines("replies.txt")
 
+yp <-  rtweet::get_mentions(n = 100, 
+                            include_rts = F,
+                            tweet_mode = "extended") 
+
 schwabtweets <- rtweet::get_mentions(n = 100, 
                                      include_rts = F,
                                      tweet_mode = "extended")  %>% 
-  filter(!(status_id %in% replies)) %>% 
-  filter(!(status_in_reply_to_status_id %in% replies)) %>% 
+  filter(!(id %in% replies)) %>% 
+  filter(!(in_reply_to_status_id  %in% replies)) %>% 
   filter(as.Date(created_at) >= lubridate::today()-lubridate::ddays(1)) %>%
-  filter(status_in_reply_to_user_id != "1410272146027433995") %>% 
-  filter(!is.na(status_in_reply_to_status_id))
+  filter(in_reply_to_status_id  != "1410272146027433995") %>% 
+  filter(!is.na(in_reply_to_status_id ))
 
 
 if (nrow(schwabtweets) == 0){
   print("No replies.")
 } else {
   
-  original_tweets <- rtweet::lookup_tweets(statuses = schwabtweets$status_in_reply_to_status_id)
+  original_tweets <- rtweet::lookup_tweets(statuses = schwabtweets$in_reply_to_status_id)
   
   replytweets <- original_tweets %>% 
     rowwise() %>%
@@ -174,9 +186,9 @@ if (nrow(schwabtweets) == 0){
     clean_schwabtext()  %>% 
     replace_links() %>% 
     replace_mentions() %>% 
-    select(original_id = status_id, schwabtext, contains("media_url")) %>% 
-    left_join(schwabtweets %>% select(original_id = status_in_reply_to_status_id, status_id))  %>% 
-    distinct(status_id, .keep_all = T) %>% 
+    select(original_id = id, schwabtext, contains("media_url")) %>% 
+    left_join(schwabtweets %>% select(original_id = in_reply_to_status_id , id))  %>% 
+    distinct(id, .keep_all = T) %>% 
     mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&"))
   
   print(paste0("tweet out ", nrow(replytweets), " replies."))
@@ -188,7 +200,7 @@ if (nrow(schwabtweets) == 0){
       print(.x$schwabtext)
 
       post_tweet(status = .x$schwabtext,
-                 in_reply_to_status_id = .x$status_id, 
+                 in_reply_to_status_id = .x$id, 
                  auto_populate_reply_metadata = T)
       
       Sys.sleep(60)
@@ -196,7 +208,7 @@ if (nrow(schwabtweets) == 0){
     })
   
   replies <- replytweets %>% 
-    pull(status_id)
+    pull(id)
   
   cat(replies, file = "replies.txt", sep = "\n", append = T)
   
@@ -225,10 +237,10 @@ if(lubridate::wday(lubridate::now()) %in% sample(1:365, size = 1)){
   my_tweets <- rtweet::get_timeline("schwabenschau", n = 100) %>% 
     distinct(text, .keep_all = T) %>% 
     filter(created_at > lubridate::now() - lubridate::dhours(12)) %>% 
-    filter(!(status_id %in% statuses_telegram)) %>% 
+    filter(!(id %in% statuses_telegram)) %>% 
     sample_n(3, replace = 3) %>% 
     distinct(text, .keep_all = T) %>% 
-    mutate(tweet_url = paste0("https://twitter.com/schwabenschau/status/", status_id))
+    mutate(tweet_url = paste0("https://twitter.com/schwabenschau/status/", id))
   
   my_tweets %>% 
     split(1:nrow(.)) %>% 
@@ -240,8 +252,8 @@ if(lubridate::wday(lubridate::now()) %in% sample(1:365, size = 1)){
         
         print("get screenshot")
         
-        if(!file.exists(paste0("img/", .x$status_id, ".png"))){
-          get_tweet_screenshots(.x$status_id, 
+        if(!file.exists(paste0("img/", .x$id, ".png"))){
+          get_tweet_screenshots(.x$id, 
                                 s = "#image_result > div:nth-child(3) > div:nth-child(2) > img",
                                 d = 20)
           
@@ -252,7 +264,7 @@ if(lubridate::wday(lubridate::now()) %in% sample(1:365, size = 1)){
         
         bot$sendPhoto(
           chat_id = adam,
-          photo = paste0("img/", .x$status_id, ".png"),
+          photo = paste0("img/", .x$id, ".png"),
           caption	= .x$tweet_url
         )  
         
@@ -265,7 +277,7 @@ if(lubridate::wday(lubridate::now()) %in% sample(1:365, size = 1)){
     })
   
   telegram_posts <- my_tweets %>% 
-    pull(status_id)
+    pull(id)
   
   cat(telegram_posts, file = "telegram.txt", sep = "\n", append = T)
   
