@@ -21,7 +21,8 @@ jobs:
         uses: actions/checkout@v2
       - name: "Install Packages"
         run: |
-          install.packages('rtweet')
+          install.packages('pak')
+          pak::pak("JBGruber/atr")
           install.packages('rex')
           install.packages('dplyr')
           install.packages('tidyr')
@@ -42,11 +43,8 @@ jobs:
       - name: "Bot - Run"
         run: Rscript 'bot.R'
         env:
-          consumer_key: ${{ secrets.CONSUMER_KEY }}
-          consumer_secret: ${{ secrets.CONSUMER_SECRET }}
-          token: ${{ secrets.TOKEN }}
-          secret: ${{ secrets.SECRET }}
-          schwabenschau_token: ${{ secrets.SCHWABENSCHAU_TOKEN }}
+          bsky_name: ${{ secrets.bsky_name }}
+          bsky_pw: ${{ secrets.bsky_pw }}
           adam_telegram: ${{ secrets.ADAM_TELEGRAM }}
       - name: "Commit"
         uses: stefanzweifel/git-auto-commit-action@v4
