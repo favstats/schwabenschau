@@ -47,16 +47,16 @@ print("get skeets")
 statuses <- readLines("statuses.txt") %>% unique()
 
 schwabenbase <- c("spiegelonline.bsky.social",
-"heute.com.de", 
-"tagesspiegel.de", 
-"belltowernews.bsky.social", 
-"netzpolitik.org",
-"table.media", 
-"uebermedien.de", 
-"taz.de", 
-"correctiv.org",  
-"analysekritik.bsky.social",
-"der-postillon.com")
+                  "heute.com.de", 
+                  "tagesspiegel.de", 
+                  "belltowernews.bsky.social", 
+                  "netzpolitik.org",
+                  "table.media", 
+                  "uebermedien.de", 
+                  "taz.de", 
+                  "correctiv.org",  
+                  "analysekritik.bsky.social",
+                  "der-postillon.com")
 
 # savee <- atr::get_skeets_authored_by("der-postillon.com") 
 # 
@@ -103,9 +103,9 @@ ts <- schwabenbase %>%
       )) %>%
       mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% 
       mutate_all(as.character) %>% 
-    mutate(skeet_author = .x) %>% 
+      mutate(skeet_author = .x) %>% 
       filter(skeet_author == handle) 
-    }) %>% 
+  }) %>% 
   distinct(text, .keep_all = T) %>% 
   mutate(created_at = lubridate::ymd_hms(indexed_at)) %>% 
   filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
@@ -152,33 +152,33 @@ if(ts_rows==0){
     mutate(schwabtext = paste0(schwabtext, "\n\nGeklaud vo: ", links))
   
   ts_rows <- nrow(ts_schwabs) 
-
+  
   print(paste0("tweet out ", ts_rows, " tweets."))
-    
-    # post_tweet(status = ts_schwabs$schwabtext[1], in_reply_to_status_id = ts_schwabs$status_id[1], auto_populate_reply_metadata = T)
-    
+  
+  # post_tweet(status = ts_schwabs$schwabtext[1], in_reply_to_status_id = ts_schwabs$status_id[1], auto_populate_reply_metadata = T)
+  
   ts_schwabs %>% 
     split(1:nrow(.)) %>% 
     purrr::walk(~{
-        
-        print(.x$schwabtext)
       
-        # get_tweet_screenshots(.x$id)
-        
-        # print(paste0("img/", as.character(.x$id), ".png"))
-        
-        post_skeet(text = .x$schwabtext)
-        
-        Sys.sleep(60)
-        
-      })
-    
-    statuses <- ts_schwabs %>% 
-      pull(uri)
-    
-    cat(statuses, file = "statuses.txt", sep = "\n", append = T)
-    
-    
+      print(.x$schwabtext)
+      
+      # get_tweet_screenshots(.x$id)
+      
+      # print(paste0("img/", as.character(.x$id), ".png"))
+      
+      post_skeet(text = .x$schwabtext, quote = .x$uri)
+      
+      Sys.sleep(60)
+      
+    })
+  
+  statuses <- ts_schwabs %>% 
+    pull(uri)
+  
+  cat(statuses, file = "statuses.txt", sep = "\n", append = T)
+  
+  
 } 
 
 
@@ -320,4 +320,3 @@ if(ts_rows==0){
 # https://tweetpik.com/dashboard
 # https://www.bannerbear.com/demos/tweetagram?tweet_id=1423889471808802816
 # #image_result > div:nth-child(3) > div:nth-child(2) > img
-
