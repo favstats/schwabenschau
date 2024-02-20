@@ -22,7 +22,7 @@ jobs:
       - name: "Install Packages"
         run: |
           install.packages('pak')
-          pak::pak("JBGruber/atr")
+          pak::pak("JBGruber/atrrr")
           install.packages('rex')
           install.packages('dplyr')
           install.packages('tidyr')
