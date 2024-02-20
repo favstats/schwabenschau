@@ -40,7 +40,7 @@ print("authenticate")
 
 # Create a token containing your blue sky key
 
-atr::auth(user = Sys.getenv("bsky_name"), password = Sys.getenv("bsky_pw"))
+atrrr::auth(user = Sys.getenv("bsky_name"), password = Sys.getenv("bsky_pw"))
 
 print("get skeets")
 
@@ -58,7 +58,7 @@ schwabenbase <- c("spiegelonline.bsky.social",
                   "analysekritik.bsky.social",
                   "der-postillon.com")
 
-# savee <- atr::get_skeets_authored_by("der-postillon.com") 
+# savee <- atrrr::get_skeets_authored_by("der-postillon.com") 
 # 
 # 
 # savee %>%
@@ -87,7 +87,7 @@ ts <- schwabenbase %>%
   # .[2:3] %>% 
   map_dfr(~{
     print(.x)
-    atr::get_skeets_authored_by(.x) %>% 
+    atrrr::get_skeets_authored_by(.x) %>% 
       mutate(handle = author |> map_chr(~{.x$handle}))  %>%
       mutate(text = record |> map_chr(~{.x$text}))  %>% 
       mutate(links = record |> map_chr(~{
