@@ -88,19 +88,8 @@ ts <- schwabenbase %>%
   map_dfr(~{
     print(.x)
     atrrr::get_skeets_authored_by(.x) %>% 
-      mutate(handle = author |> map_chr(~{.x$handle}))  %>%
-      mutate(text = record |> map_chr(~{.x$text}))  %>% 
-      mutate(links = record |> map_chr(~{
-        # print(.x$embed$external$uri)
-        if(length(.x$embed$external$uri)!=0){
-          # print("hi")
-          return(.x$embed$external$uri)
-        } else {
-          # print("hiss")
-          return(NA)
-        }
-      }
-      )) %>%
+      mutate(handle = author_handle)  %>%
+      mutate(links = uri) %>%
       mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% 
       mutate_all(as.character) %>% 
       mutate(skeet_author = .x) %>% 
