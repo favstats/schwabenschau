@@ -83,6 +83,8 @@ schwabenbase <- c("spiegelonline.bsky.social",
 #   mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% View()
 #   
 #   
+gettem <- purrr::possibly(atrrr::get_skeets_authored_by, otherwise = NULL, quiet = F)
+
 ts <- schwabenbase %>% 
   # .[2:3] %>% 
   map_dfr(~{
