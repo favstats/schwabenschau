@@ -137,9 +137,9 @@ if(ts_rows==0){
     # print_data %>% 
     distinct(schwabtext, .keep_all = T) %>% 
     print_data %>% 
-    replace_links() %>% 
+    replace_links(uri) %>% 
     print_data %>% 
-    replace_mentions() %>% 
+    replace_mentions(uri) %>% 
     print_data %>% 
     distinct(uri, .keep_all = T)  %>% 
     print_data %>% 
