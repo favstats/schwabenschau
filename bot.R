@@ -46,8 +46,12 @@ print("get skeets")
 
 statuses <- readLines("statuses.txt") %>% unique()
 
-schwabenbase <- c("spiegelonline.bsky.social",
-                  "heute.com.de", 
+schwabenbase <- c("oezdemir.de",
+                  "regierungbw.bsky.social",
+                  "bwegt.bsky.social",
+                  "unistuttgart.bsky.social",
+                  "stuttgarterzeitung.bsky.social",
+                  "spiegelonline.bsky.social",
                   "tagesspiegel.de", 
                   "belltowernews.bsky.social", 
                   "netzpolitik.org",
@@ -89,7 +93,7 @@ ts <- schwabenbase %>%
   # .[2:3] %>% 
   map_dfr(~{
     print(.x)
-    atrrr::get_skeets_authored_by(.x) %>% 
+    gettem(.x) %>% 
       mutate(handle = author_handle)  %>%
       mutate(links = uri) %>%
       mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% 
