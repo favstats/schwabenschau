@@ -103,7 +103,7 @@ ts <- schwabenbase %>%
   }) %>% 
   distinct(text, .keep_all = T) %>% 
   mutate(created_at = lubridate::ymd_hms(indexed_at)) %>% 
-  filter(created_at > lubridate::now() - lubridate::dhours(2)) %>% 
+  filter(created_at > lubridate::now() - lubridate::dhours(3)) %>% 
   filter(!(uri %in% statuses)) 
 
 
@@ -144,7 +144,7 @@ if(ts_rows==0){
     distinct(uri, .keep_all = T)  %>% 
     print_data %>% 
     mutate(schwabtext = str_replace_all(schwabtext, "&amb;", "&")) %>% 
-    mutate(schwabtext = paste0(schwabtext, "\n\nGeklaud vo: ", links))
+    mutate(schwabtext = paste0(schwabtext, "\n\nGeklaud vo:"))
   
   ts_rows <- nrow(ts_schwabs) 
   
