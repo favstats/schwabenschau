@@ -86,7 +86,7 @@ schwabenbase <- c("oezdemir.de",
 #   )) %>%
 #   mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% View()
 #   
-#   
+
 gettem <- purrr::possibly(atrrr::get_skeets_authored_by, otherwise = tibble(no_data = T, author_handle = NA, uri = NA), quiet = F)
 
 ts <- schwabenbase %>% 
