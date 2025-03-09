@@ -50,13 +50,13 @@ schwabenbase <- c("oezdemir.de",
                   "regierungbw.bsky.social",
                   "bwegt.bsky.social",
                   "unistuttgart.bsky.social",
-                  "stuttgarterzeitung.bsky.social",
+                  "stuttgarter-zeitung.de",
                   "spiegelonline.bsky.social",
                   "tagesspiegel.de", 
                   "belltowernews.bsky.social", 
                   "netzpolitik.org",
                   "table.media", 
-                  "uebermedien.de", 
+                  "zeit.de", 
                   "taz.de", 
                   "correctiv.org",  
                   "analysekritik.bsky.social",
@@ -87,7 +87,7 @@ schwabenbase <- c("oezdemir.de",
 #   mutate(links = ifelse(is.na(links), paste0("@", handle), links)) %>% View()
 #   
 #   
-gettem <- purrr::possibly(atrrr::get_skeets_authored_by, otherwise = NULL, quiet = F)
+gettem <- purrr::possibly(atrrr::get_skeets_authored_by, otherwise = tibble(no_data = T, author_handle = NA, uri = NA), quiet = F)
 
 ts <- schwabenbase %>% 
   # .[2:3] %>% 
